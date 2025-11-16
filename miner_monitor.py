@@ -77,9 +77,49 @@ def send_email(subject, body):
         return False
 
 
+def take_luxor_screenshot():
+    """Take a screenshot of the Luxor dashboard and return the file path"""
+    options = Options()
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--incognito')
+    options.add_argument('--disable-blink-features=AutomationControlled')
+    options.add_argument(
+        'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
+    options.add_argument('--window-size=1920,1080')  # Full size for screenshot
+
+    driver = None
+    try:
+        driver = webdriver.Chrome(options=options)
+        driver.get(TARGET_URL)
+
+        # Wait for the page to load
+        time.sleep(5)
+
+        # Take screenshot
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        screenshot_path = f"/tmp/luxor_dashboard_{timestamp}.png"
+        driver.save_screenshot(screenshot_path)
+
+        print(f"Screenshot saved to: {screenshot_path}")
+        return screenshot_path
+
+    except Exception as e:
+        print(f"Error taking screenshot: {e}")
+        return None
+    finally:
+        if driver:
+            driver.quit()
+
+
 def send_support_ticket_email(miners_down, offline_duration_hours):
-    """Send email with support ticket creation link"""
+    """Send email with support ticket creation link and attached screenshot"""
     import urllib.parse
+    from email.mime.image import MIMEImage
+
+    # Take a screenshot of the Luxor dashboard
+    screenshot_path = take_luxor_screenshot()
 
     # Prepare the support ticket email content
     ticket_subject = f"Support Request - {miners_down} Miner(s) Offline"
@@ -120,9 +160,11 @@ This will open your email client with a draft email to {SUPPORT_EMAIL} containin
 - Details about the offline miners
 - Your Luxor dashboard link
 
-IMPORTANT: Before sending the email, please:
-1. Take a screenshot of your full Luxor page
-2. Attach the screenshot to the email
+SCREENSHOT ATTACHED: A screenshot of your Luxor dashboard is attached to this email.
+
+IMPORTANT: When sending the support email, please:
+1. Use the attached screenshot (luxor_dashboard_*.png)
+2. Attach the screenshot to your email to {SUPPORT_EMAIL}
 3. Review the information and make any necessary edits
 4. Click Send
 
@@ -134,7 +176,37 @@ Current Status:
 The email will NOT be sent automatically - you have full control.
 """
 
-    return send_email(subject, body)
+    # Send email with screenshot attachment
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = EMAIL_FROM
+        msg['To'] = EMAIL_TO
+        msg['Subject'] = subject
+
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Attach screenshot if available
+        if screenshot_path and os.path.exists(screenshot_path):
+            with open(screenshot_path, 'rb') as f:
+                img_data = f.read()
+                image = MIMEImage(img_data, name=os.path.basename(screenshot_path))
+                msg.attach(image)
+                print(f"Screenshot attached to email: {screenshot_path}")
+        else:
+            print("Warning: Screenshot not available, sending email without attachment")
+
+        # Connect to Gmail SMTP server
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(EMAIL_FROM, GMAIL_APP_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+
+        print(f"Email sent: {subject}")
+        return True
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+        return False
 
 
 def get_worker_count():
