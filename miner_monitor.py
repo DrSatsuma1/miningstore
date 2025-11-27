@@ -145,35 +145,60 @@ Best regards"""
     mailto_link = f"mailto:{SUPPORT_EMAIL}?subject={urllib.parse.quote(ticket_subject)}&body={urllib.parse.quote(ticket_body)}"
 
     # Email to the user asking if they want to create a support ticket
-    subject = f"Support Ticket Available - {miners_down} Miner(s) Still Offline"
-    body = f"""Your miner(s) have been offline for {offline_duration_hours:.1f} hours.
+    subject = f"[ACTION NEEDED] Support Ticket - {miners_down} Miner(s) Offline"
+    body = f"""
+================================================================================
+                         SUPPORT TICKET AVAILABLE
+================================================================================
 
-Would you like to create a support ticket?
+STATUS ALERT: Your miner(s) have been offline for {offline_duration_hours:.1f} hours
 
-If yes, click the link below to open a pre-filled email draft:
+--------------------------------------------------------------------------------
+CURRENT STATUS
+--------------------------------------------------------------------------------
+Expected Workers:  {EXPECTED_WORKERS}
+Offline Miners:    {miners_down}
+Offline Duration:  {offline_duration_hours:.1f} hours
+
+--------------------------------------------------------------------------------
+ACTION REQUIRED
+--------------------------------------------------------------------------------
+Would you like to create a support ticket with Mining Store?
+
+>> CLICK HERE TO CREATE SUPPORT TICKET <<
 
 {mailto_link}
 
-This will open your email client with a draft email to {SUPPORT_EMAIL} containing:
-- Your Client ID ({CLIENT_ID})
-- Your machine types ({MACHINE_TYPES})
-- Details about the offline miners
-- Your Luxor dashboard link
+This link will open your email client with a pre-filled support request to:
+{SUPPORT_EMAIL}
 
-SCREENSHOT ATTACHED: A screenshot of your Luxor dashboard is attached to this email.
+The email draft includes:
+  • Your Client ID: {CLIENT_ID}
+  • Your Machine Types: {MACHINE_TYPES}
+  • Issue details and offline duration
+  • Your Luxor dashboard link
 
-IMPORTANT: When sending the support email, please:
-1. Use the attached screenshot (luxor_dashboard_*.png)
-2. Attach the screenshot to your email to {SUPPORT_EMAIL}
-3. Review the information and make any necessary edits
-4. Click Send
+--------------------------------------------------------------------------------
+SCREENSHOT INCLUDED
+--------------------------------------------------------------------------------
+A screenshot of your Luxor dashboard is attached to this email.
+File: luxor_dashboard_*.png
 
-Current Status:
-- Expected workers: {EXPECTED_WORKERS}
-- Offline miners: {miners_down}
-- Offline since: {offline_duration_hours:.1f} hours ago
+--------------------------------------------------------------------------------
+HOW TO SUBMIT SUPPORT TICKET
+--------------------------------------------------------------------------------
+1. Click the link above to open your email client
+2. Download the attached screenshot from this email
+3. Attach the screenshot to the support email
+4. Review the pre-filled information
+5. Click Send
 
-The email will NOT be sent automatically - you have full control.
+NOTE: The support email will NOT be sent automatically.
+      You have full control before sending.
+
+--------------------------------------------------------------------------------
+Dashboard: {TARGET_URL}
+================================================================================
 """
 
     # Send email with screenshot attachment
@@ -340,17 +365,37 @@ def check_and_alert():
             print("First time detecting issue - will alert")
 
         if should_alert:
-            subject = f"ALERT {miners_down} MINER DOWN"
-            body = f"""Miner Alert!
+            subject = f"[ALERT] {miners_down} Miner{'s' if miners_down > 1 else ''} Offline"
+            body = f"""
+================================================================================
+                            MINER ALERT - OFFLINE
+================================================================================
 
-Expected workers: {EXPECTED_WORKERS}
-Current workers: {worker_count}
-Miners down: {miners_down}
+STATUS: OFFLINE
 
-Time: {current_time.strftime('%Y-%m-%d %H:%M:%S')}
-URL: {TARGET_URL}
+{miners_down} miner{'s are' if miners_down > 1 else ' is'} currently offline and needs attention.
 
-This alert will not repeat for {ALERT_COOLDOWN_HOURS} hours.
+--------------------------------------------------------------------------------
+DETAILS
+--------------------------------------------------------------------------------
+Expected Workers:  {EXPECTED_WORKERS}
+Current Workers:   {worker_count}
+Miners Offline:    {miners_down}
+
+Time Detected:     {current_time.strftime('%Y-%m-%d %H:%M:%S')}
+
+--------------------------------------------------------------------------------
+NEXT STEPS
+--------------------------------------------------------------------------------
+• Monitor your Luxor dashboard for changes
+• If miners remain offline for {ALERT_COOLDOWN_HOURS} hours, you'll receive a
+  support ticket option
+
+Dashboard: {TARGET_URL}
+
+--------------------------------------------------------------------------------
+Note: This alert will not repeat for {ALERT_COOLDOWN_HOURS} hours unless status changes.
+================================================================================
 """
             if send_email(subject, body):
                 state['last_alert_time'] = current_time.isoformat()
@@ -373,15 +418,29 @@ This alert will not repeat for {ALERT_COOLDOWN_HOURS} hours.
         if state['last_status'] == 'down' or state['last_worker_count'] and state['last_worker_count'] < EXPECTED_WORKERS:
             # Send recovery email
             should_send_recovery = True
-            subject = "RECOVERY - All Miners Back Online"
-            body = f"""All miners have recovered!
+            subject = "[RECOVERY] All Miners Back Online"
+            body = f"""
+================================================================================
+                         RECOVERY - ALL MINERS ONLINE
+================================================================================
 
-Expected workers: {EXPECTED_WORKERS}
-Current workers: {worker_count}
-Previous count: {state['last_worker_count']}
+STATUS: ONLINE
 
-Time: {current_time.strftime('%Y-%m-%d %H:%M:%S')}
-URL: {TARGET_URL}
+Great news! All miners have recovered and are back online.
+
+--------------------------------------------------------------------------------
+DETAILS
+--------------------------------------------------------------------------------
+Expected Workers:  {EXPECTED_WORKERS}
+Current Workers:   {worker_count}
+Previous Count:    {state['last_worker_count']}
+
+Recovery Time:     {current_time.strftime('%Y-%m-%d %H:%M:%S')}
+
+--------------------------------------------------------------------------------
+Your mining operations have returned to normal.
+Dashboard: {TARGET_URL}
+================================================================================
 """
             send_email(subject, body)
 
@@ -411,9 +470,32 @@ if __name__ == "__main__":
         print(f"FATAL ERROR: {e}")
         # Try to send error notification
         try:
-            send_email(
-                "ERROR - Miner Monitor Script Failed",
-                f"The monitoring script encountered an error:\n\n{e}\n\nTime: {datetime.now()}"
-            )
+            error_body = f"""
+================================================================================
+                      MINER MONITOR SCRIPT ERROR
+================================================================================
+
+STATUS: ERROR
+
+The miner monitoring script encountered an error and may need attention.
+
+--------------------------------------------------------------------------------
+ERROR DETAILS
+--------------------------------------------------------------------------------
+{str(e)}
+
+Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+--------------------------------------------------------------------------------
+RECOMMENDED ACTIONS
+--------------------------------------------------------------------------------
+• Check the monitor.log file for detailed error information
+• Verify ChromeDriver is installed and working
+• Ensure network connectivity to Luxor dashboard
+• Restart the monitoring script if needed
+
+================================================================================
+"""
+            send_email("[ERROR] Miner Monitor Script Failed", error_body)
         except:
             pass
