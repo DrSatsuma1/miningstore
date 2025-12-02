@@ -9,6 +9,20 @@ ssh sats@104.223.84.214
 
 ---
 
+## First-Time Install (Do This First!)
+
+If you don't see a `minermonitor` folder when you run `ls`, you need to install it:
+
+```bash
+git clone https://github.com/DrSatsuma1/minermonitor.git
+cd minermonitor
+chmod +x setup.sh
+./setup.sh
+python3 miner_monitor.py
+```
+
+---
+
 ## How to Update the Software
 
 ### Step 1: Connect to your VPS
@@ -43,23 +57,6 @@ python3 miner_monitor.py &
 
 ```bash
 ssh sats@104.223.84.214 "cd ~/minermonitor && git pull origin main && sudo systemctl restart minermonitor"
-```
-
----
-
-## First-Time Setup on a New VPS
-
-```bash
-# 1. Clone the repo
-git clone https://github.com/DrSatsuma1/minermonitor.git
-cd minermonitor
-
-# 2. Run setup script
-chmod +x setup.sh
-./setup.sh
-
-# 3. Start the monitor
-python3 miner_monitor.py
 ```
 
 ---
