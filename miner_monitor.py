@@ -28,6 +28,11 @@ DOWN_ALERT_THRESHOLD_HOURS = 5  # Only alert after miner is down for 5 hours
 WEEKLY_REPORT_DAYS = 7  # Send report every 7 days
 HISTORY_RETENTION_DAYS = 30  # Keep 30 days of history
 
+# Support ticket configuration
+CLIENT_ID = "mscathy"  # Your Luxor client ID
+MACHINE_TYPES = "M60S+ 202T"  # Your machine types
+SUPPORT_EMAIL = "Support@miningstore.com"  # Mining store support email
+
 
 def load_state():
     """Load previous state from file"""
@@ -148,24 +153,6 @@ def send_weekly_report(state):
     body = f"""Weekly Miner Uptime Report
 
 Uptime Statistics:
-==================
-Last 7 days:  {uptime_7d_str}
-Last 30 days: {uptime_30d_str}
-
-Current Status:
-===============
-Expected workers: {EXPECTED_WORKERS}
-Last count: {state['last_worker_count']}
-Status: {state['last_status']}
-
-Report generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
-
-    if send_email(subject, body):
-        state['last_weekly_report'] = datetime.now().isoformat()
-        print("Weekly report sent successfully")
-        return True
-    return False
 
 
 def get_worker_count():
@@ -349,8 +336,10 @@ Current workers: {worker_count}
 Previous count: {state['last_worker_count']}
 Total downtime: {hours_down:.1f} hours
 
-Time: {current_time.strftime('%Y-%m-%d %H:%M:%S')}
-URL: {TARGET_URL}
+View Dashboard: {TARGET_URL}
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
             send_email(subject, body)
 
@@ -391,9 +380,32 @@ if __name__ == "__main__":
         print(f"FATAL ERROR: {e}")
         # Try to send error notification
         try:
-            send_email(
-                "ERROR - Miner Monitor Script Failed",
-                f"The monitoring script encountered an error:\n\n{e}\n\nTime: {datetime.now()}"
-            )
+            error_body = f"""
+MONITORING SCRIPT ERROR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ Script Error
+
+The miner monitoring script encountered an error and may need attention.
+
+
+ERROR DETAILS
+
+{str(e)}
+
+Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+
+TROUBLESHOOTING
+
+  • Check monitor.log for detailed error information
+  • Verify ChromeDriver is installed and working
+  • Ensure network connectivity to Luxor dashboard
+  • Try restarting the monitoring script
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"""
+            send_email("⚠️ Monitor Script Error", error_body)
         except:
             pass
