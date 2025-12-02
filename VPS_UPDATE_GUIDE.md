@@ -32,13 +32,12 @@ ssh sats@104.223.84.214
 
 ### Step 2: Navigate to the project folder
 ```bash
-cd ~/minermonitor
+cd /miner-monitor
 ```
-*(Adjust path if you installed it elsewhere)*
 
 ### Step 3: Pull the latest code
 ```bash
-git pull origin main
+sudo git pull origin main
 ```
 
 ### Step 4: Restart the service (if running)
@@ -56,7 +55,7 @@ python3 miner_monitor.py &
 ## One-Liner Update (Copy & Paste)
 
 ```bash
-ssh sats@104.223.84.214 "cd ~/minermonitor && git pull origin main && sudo systemctl restart minermonitor"
+ssh sats@104.223.84.214 "cd /miner-monitor && sudo git pull origin main"
 ```
 
 ---
