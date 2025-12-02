@@ -23,13 +23,14 @@ Since this is a private repo, you need to set up git with a Personal Access Toke
 5. Click **Generate token**
 6. **Copy the token** (you won't see it again!)
 
-### Step 2: Initialize git in the install folder
+### Step 2: Take ownership and initialize git
 ```bash
+sudo chown -R sats:sats /miner-monitor
 cd /miner-monitor
-sudo git init
-sudo git remote add origin https://YOUR_TOKEN@github.com/DrSatsuma1/minermonitor.git
-sudo git fetch origin
-sudo git reset --hard origin/main
+git init
+git remote add origin https://YOUR_TOKEN@github.com/DrSatsuma1/minermonitor.git
+git fetch origin
+git reset --hard origin/main
 ```
 
 Replace `YOUR_TOKEN` with your actual token.
@@ -42,7 +43,7 @@ Replace `YOUR_TOKEN` with your actual token.
 ```bash
 ssh sats@104.223.84.214
 cd /miner-monitor
-sudo git pull origin main
+git pull origin main
 ```
 
 ### Step 2: Restart the service (if running)
@@ -70,7 +71,7 @@ That's it! The token is saved in the remote URL, so no password needed.
 ### Update the saved token (if expired)
 ```bash
 cd /miner-monitor
-sudo git remote set-url origin https://NEW_TOKEN@github.com/DrSatsuma1/minermonitor.git
+git remote set-url origin https://NEW_TOKEN@github.com/DrSatsuma1/minermonitor.git
 ```
 
 ---
