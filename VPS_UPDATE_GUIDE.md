@@ -38,10 +38,21 @@ Replace `YOUR_TOKEN` with your actual token.
 
 ## How to Update (After Setup)
 
+### Step 1: Pull the latest code
 ```bash
 ssh sats@104.223.84.214
 cd /miner-monitor
 sudo git pull origin main
+```
+
+### Step 2: Restart the service (if running)
+```bash
+# If running with systemd:
+sudo systemctl restart minermonitor
+
+# OR if running manually, kill and restart:
+pkill -f miner_monitor.py
+python3 miner_monitor.py &
 ```
 
 That's it! The token is saved in the remote URL, so no password needed.
