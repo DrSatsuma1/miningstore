@@ -153,6 +153,24 @@ def send_weekly_report(state):
     body = f"""Weekly Miner Uptime Report
 
 Uptime Statistics:
+==================
+Last 7 days:  {uptime_7d_str}
+Last 30 days: {uptime_30d_str}
+
+Current Status:
+===============
+Expected workers: {EXPECTED_WORKERS}
+Last count: {state['last_worker_count']}
+Status: {state['last_status']}
+
+Report generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+
+    if send_email(subject, body):
+        state['last_weekly_report'] = datetime.now().isoformat()
+        print("Weekly report sent successfully")
+        return True
+    return False
 
 
 def get_worker_count():
