@@ -103,7 +103,7 @@ crontab -l
 ## How It Works
 
 ### State Tracking
-The script saves state to `/tmp/miner_monitor_state.json`:
+The script saves state to `miner_monitor_state.json` in the same directory as the script:
 - Last worker count
 - When it last sent an alert
 - Current status (ok/down/unknown)
@@ -182,11 +182,11 @@ Test different scenarios:
 # Normal run
 python3 miner_monitor.py
 
-# Check state file
-cat /tmp/miner_monitor_state.json
+# Check state file (in same directory as script)
+cat miner_monitor_state.json
 
 # Reset state (force new alert)
-rm /tmp/miner_monitor_state.json
+rm miner_monitor_state.json
 python3 miner_monitor.py
 ```
 

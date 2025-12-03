@@ -23,7 +23,8 @@ EXPECTED_WORKERS = 57
 EMAIL_FROM = "codegraymining@gmail.com"
 EMAIL_TO = "cstott@gmail.com"
 GMAIL_APP_PASSWORD = "oqal afxf qjth purb"
-STATE_FILE = "/tmp/miner_monitor_state.json"
+# Store state file in same directory as script to avoid permission issues
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "miner_monitor_state.json")
 DOWN_ALERT_THRESHOLD_HOURS = 5  # Only alert after miner is down for 5 hours
 WEEKLY_REPORT_DAYS = 7  # Send report every 7 days
 HISTORY_RETENTION_DAYS = 30  # Keep 30 days of history
