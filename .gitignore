@@ -23,5 +23,5 @@ Thumbs.db
 # Logs
 *.log
 
-# State files (optional - remove if you want to track state)
-/tmp/
+# State files (runtime state, not to be version controlled)
+miner_monitor_state.json
