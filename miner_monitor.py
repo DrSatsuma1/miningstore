@@ -25,7 +25,7 @@ EMAIL_TO = "cstott@gmail.com"
 GMAIL_APP_PASSWORD = "oqal afxf qjth purb"
 # Store state file in same directory as script to avoid permission issues
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "miner_monitor_state.json")
-DOWN_ALERT_THRESHOLD_HOURS = 5  # Only alert after miner is down for 5 hours
+DOWN_ALERT_THRESHOLD_HOURS = 6  # Only alert after miner is down for 6 hours
 WEEKLY_REPORT_DAYS = 7  # Send report every 7 days
 HISTORY_RETENTION_DAYS = 30  # Keep 30 days of history
 
@@ -342,13 +342,14 @@ URL: {TARGET_URL}
     elif worker_count >= EXPECTED_WORKERS:
         # All miners are up (or more)
         if state['last_status'] == 'down' and state['down_since'] is not None:
-            # Send recovery email
             down_since_dt = datetime.fromisoformat(state['down_since'])
             down_duration = current_time - down_since_dt
             hours_down = down_duration.total_seconds() / 3600
 
-            subject = "RECOVERY - All Miners Back Online"
-            body = f"""All miners have recovered!
+            # Only send recovery email if downtime exceeded the alert threshold
+            if hours_down > DOWN_ALERT_THRESHOLD_HOURS:
+                subject = "RECOVERY - All Miners Back Online"
+                body = f"""All miners have recovered!
 
 Expected workers: {EXPECTED_WORKERS}
 Current workers: {worker_count}
@@ -360,7 +361,9 @@ View Dashboard: {TARGET_URL}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
-            send_email(subject, body)
+                send_email(subject, body)
+            else:
+                print(f"Miners recovered after {hours_down:.1f} hours (below {DOWN_ALERT_THRESHOLD_HOURS}h threshold, no notification)")
 
             # Clear down tracking
             state['down_since'] = None
