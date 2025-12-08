@@ -342,13 +342,14 @@ URL: {TARGET_URL}
     elif worker_count >= EXPECTED_WORKERS:
         # All miners are up (or more)
         if state['last_status'] == 'down' and state['down_since'] is not None:
-            # Send recovery email
             down_since_dt = datetime.fromisoformat(state['down_since'])
             down_duration = current_time - down_since_dt
             hours_down = down_duration.total_seconds() / 3600
 
-            subject = "RECOVERY - All Miners Back Online"
-            body = f"""All miners have recovered!
+            # Only send recovery email if downtime exceeded the alert threshold
+            if hours_down > DOWN_ALERT_THRESHOLD_HOURS:
+                subject = "RECOVERY - All Miners Back Online"
+                body = f"""All miners have recovered!
 
 Expected workers: {EXPECTED_WORKERS}
 Current workers: {worker_count}
@@ -360,7 +361,9 @@ View Dashboard: {TARGET_URL}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
-            send_email(subject, body)
+                send_email(subject, body)
+            else:
+                print(f"Miners recovered after {hours_down:.1f} hours (below {DOWN_ALERT_THRESHOLD_HOURS}h threshold, no notification)")
 
             # Clear down tracking
             state['down_since'] = None
