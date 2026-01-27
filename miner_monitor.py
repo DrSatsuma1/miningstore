@@ -4,9 +4,11 @@ Luxor Mining Worker Monitor
 Checks worker count every hour and alerts when miners go down
 """
 
+import fcntl
 import json
 import os
 import smtplib
+import sys
 import time
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
@@ -25,6 +27,7 @@ EMAIL_TO = "cstott@gmail.com"
 GMAIL_APP_PASSWORD = "oqal afxf qjth purb"
 # Store state file in same directory as script to avoid permission issues
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "miner_monitor_state.json")
+LOCK_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "miner_monitor.lock")
 DOWN_ALERT_THRESHOLD_HOURS = 6  # Only alert after miner is down for 6 hours
 WEEKLY_REPORT_DAYS = 7  # Send report every 7 days
 HISTORY_RETENTION_DAYS = 30  # Keep 30 days of history
@@ -124,8 +127,10 @@ def calculate_uptime_percentage(state, days):
     if not relevant_history:
         return None
 
-    # Calculate uptime (count checks where miners were up)
-    up_count = sum(1 for entry in relevant_history if entry['status'] == 'ok')
+    # Calculate uptime based on actual worker counts vs current expected
+    # (not stored status, which may be stale if EXPECTED_WORKERS changed)
+    up_count = sum(1 for entry in relevant_history
+                   if entry['worker_count'] >= EXPECTED_WORKERS)
     total_count = len(relevant_history)
 
     if total_count == 0:
@@ -396,6 +401,14 @@ View Dashboard: {TARGET_URL}
 
 
 if __name__ == "__main__":
+    # Use file locking to prevent concurrent runs
+    lock_file = open(LOCK_FILE, 'w')
+    try:
+        fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except IOError:
+        print("Another instance is already running. Exiting.")
+        sys.exit(0)
+
     try:
         check_and_alert()
     except Exception as e:
@@ -431,3 +444,6 @@ TROUBLESHOOTING
             send_email("⚠️ Monitor Script Error", error_body)
         except:
             pass
+    finally:
+        fcntl.flock(lock_file, fcntl.LOCK_UN)
+        lock_file.close()
