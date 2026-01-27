@@ -19,7 +19,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 # Configuration
 TARGET_URL = "https://app.luxor.tech/en/views/watcher?token=watcher-16ba5303d90aa1717695e57800f64fa8"
-EXPECTED_WORKERS = 56
+EXPECTED_WORKERS = 57
 EMAIL_FROM = "codegraymining@gmail.com"
 EMAIL_TO = "cstott@gmail.com"
 GMAIL_APP_PASSWORD = "oqal afxf qjth purb"
