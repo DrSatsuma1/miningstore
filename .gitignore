@@ -25,3 +25,6 @@ Thumbs.db
 
 # State files (runtime state, not to be version controlled)
 miner_monitor_state.json
+
+# Config file with dashboard tokens (contains sensitive URLs)
+miners.json

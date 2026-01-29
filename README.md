@@ -1,57 +1,83 @@
-# Luxor Miner Monitor
+# Luxor Miner Monitor - Multi-Dashboard Version
 
-Automated monitoring script that checks your Luxor mining workers every hour and sends email alerts when miners go down.
+Automated monitoring script that checks multiple Luxor mining dashboards every hour and sends email alerts when miners go down. Each alert clearly identifies which client/site is affected.
 
 ## What This Does
 
-1. **Every hour**: Visits your Luxor dashboard in headless Chrome (incognito mode)
-2. **Scrapes**: Gets the worker count from the green checkmark number
-3. **Compares**: Checks if count equals 57 (your expected number)
-4. **Alerts**: Emails you if miners are down
-5. **Recovers**: Emails when all miners come back online
+1. **Every hour**: Loops through all dashboards in your config file
+2. **Scrapes**: Gets the worker count from each Luxor watcher dashboard
+3. **Compares**: Checks if count matches expected for each site
+4. **Alerts**: Emails you with site name in subject when miners are down
+5. **Recovers**: Emails when miners come back online
+6. **Reports**: Sends weekly combined uptime report for all sites
 
 ## Files
 
 - `miner_monitor.py` - Main monitoring script
+- `miners.json` - Your dashboard configuration (create from example)
+- `miners.example.json` - Template to copy
 - `setup.sh` - Installs all dependencies
 - `README.md` - This file
 
-## Installation on Your VPS
+## Quick Setup
 
-### Step 1: Upload Files
-
-Upload these files to your VPS in a directory like `/home/yourusername/miner-monitor/`
+### 1. Create Your Config File
 
 ```bash
-# Create directory
-mkdir -p ~/miner-monitor
-cd ~/miner-monitor
-
-# Upload miner_monitor.py and setup.sh here
+cp miners.example.json miners.json
 ```
 
-### Step 2: Run Setup Script
+Edit `miners.json` with your dashboards:
+
+```json
+{
+  "miners": [
+    {
+      "name": "Client A - Main Site",
+      "dashboard_url": "https://app.luxor.tech/en/views/watcher?token=YOUR_TOKEN",
+      "expected_workers": 57,
+      "client_id": "clienta",
+      "machine_types": "S19 Pro 110T"
+    },
+    {
+      "name": "Client B - Warehouse",
+      "dashboard_url": "https://app.luxor.tech/en/views/watcher?token=ANOTHER_TOKEN",
+      "expected_workers": 120,
+      "client_id": "clientb",
+      "machine_types": "M60S+ 202T"
+    }
+  ]
+}
+```
+
+### Config Fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Display name shown in emails (e.g., "Client A - Main Site") |
+| `dashboard_url` | Yes | Luxor watcher URL with token |
+| `expected_workers` | Yes | Number of miners expected to be online |
+| `client_id` | No | Your Luxor client ID (for support reference) |
+| `machine_types` | No | Machine model info (for support reference) |
+
+### 2. Update Email Settings
+
+Edit `miner_monitor.py` and update these lines:
+
+```python
+EMAIL_FROM = "your-email@gmail.com"
+EMAIL_TO = "alerts@yourcompany.com"
+GMAIL_APP_PASSWORD = "your app password"
+```
+
+### 3. Install Dependencies
 
 ```bash
 chmod +x setup.sh
 ./setup.sh
 ```
 
-This installs:
-- Python3 and pip
-- Google Chrome (headless browser)
-- ChromeDriver (Selenium controller)
-- Selenium Python package
-
-### Step 3: Make Script Executable
-
-```bash
-chmod +x miner_monitor.py
-```
-
-### Step 4: Test the Script
-
-Run it manually to verify it works:
+### 4. Test
 
 ```bash
 python3 miner_monitor.py
@@ -59,153 +85,131 @@ python3 miner_monitor.py
 
 You should see output like:
 ```
-==================================================
-Check started at: 2025-10-23 20:30:00
-==================================================
-Successfully scraped worker count: 56
-Current worker count: 56
-Expected worker count: 57
+============================================================
+Multi-Dashboard Check started at: 2025-01-28 10:00:00
+============================================================
+Loaded 2 dashboard(s) from config
+
+--- Checking: Client A - Main Site ---
+Expected workers: 57
+Successfully scraped worker count (Method 1): 57
+Status: OK - All miners online for Client A - Main Site
+
+--- Checking: Client B - Warehouse ---
+Expected workers: 120
+Successfully scraped worker count (Method 1): 118
+Miners down detected. Started tracking at 2025-01-28 10:00:00
 ...
-Email sent: ALERT 1 MINER DOWN
-==================================================
+
+--- Summary: 2 succeeded, 0 failed ---
+============================================================
 ```
 
-### Step 5: Set Up Hourly Cron Job
-
-Edit your crontab:
+### 5. Set Up Cron
 
 ```bash
 crontab -e
 ```
 
-Add this line (replace `/home/yourusername` with your actual path):
-
+Add:
 ```
-0 * * * * cd /home/yourusername/miner-monitor && /usr/bin/python3 miner_monitor.py >> /home/yourusername/miner-monitor/monitor.log 2>&1
-```
-
-**What this means:**
-- `0 * * * *` - Run at minute 0 of every hour
-- `cd /home/yourusername/miner-monitor` - Go to script directory
-- `/usr/bin/python3 miner_monitor.py` - Run the script
-- `>> monitor.log 2>&1` - Save all output to monitor.log file
-
-Save and exit (Ctrl+X, then Y, then Enter in nano).
-
-### Step 6: Verify Cron Job
-
-Check that cron job was added:
-
-```bash
-crontab -l
+0 * * * * cd /path/to/miner-monitor && /usr/bin/python3 miner_monitor.py >> monitor.log 2>&1
 ```
 
-## How It Works
+## How Alerts Work
 
-### State Tracking
-The script saves state to `miner_monitor_state.json` in the same directory as the script:
-- Last worker count
-- When it last sent an alert
-- Current status (ok/down/unknown)
+### Alert Emails
 
-### Alert Logic
+Subject line includes the site name:
+```
+ALERT: [Client A - Main Site] 3 MINERS DOWN FOR 6 HOURS
+```
 
-**When miners go down (count < 57):**
-- Sends alert email: "ALERT X MINER DOWN"
-- Won't send another alert for 12 hours (cooldown period)
-- Continues monitoring but suppresses duplicate alerts
+Email body includes:
+- Site name prominently displayed
+- Expected vs actual worker count
+- How long miners have been down
+- Direct link to that site's dashboard
+- Link to open support ticket
 
-**When miners recover (count returns to 57):**
-- Sends recovery email: "RECOVERY - All Miners Back Online"
-- Resets alert status
+### Recovery Emails
 
-**If count > 57:**
-- No alert (you only care about down miners)
-- Logs as INFO
+```
+RECOVERY: [Client A - Main Site] All Miners Back Online
+```
 
-### Email Sending
+### Weekly Reports
 
-Uses Gmail's SMTP server:
-- Server: smtp.gmail.com:587
-- Protocol: STARTTLS (encrypted)
-- Authentication: App Password (not your regular Gmail password)
+One combined email showing all dashboards:
 
-The app password is stored in the script. Gmail requires app passwords for scripts because they're more secure than using your main password.
+| Dashboard | Workers | 7-Day | 30-Day | Status |
+|-----------|---------|-------|--------|--------|
+| Client A - Main Site | 57 / 57 | 99.2% | 98.5% | Online |
+| Client B - Warehouse | 118 / 120 | 95.1% | 96.2% | Offline |
+
+## State File Structure
+
+The script stores state per-dashboard in `miner_monitor_state.json`:
+
+```json
+{
+  "Client A - Main Site": {
+    "last_alert_time": null,
+    "last_worker_count": 57,
+    "last_status": "ok",
+    "down_since": null,
+    "history": [...]
+  },
+  "Client B - Warehouse": {
+    "last_alert_time": "2025-01-28T04:00:00",
+    "last_worker_count": 118,
+    "last_status": "down",
+    "down_since": "2025-01-27T22:00:00",
+    "history": [...]
+  },
+  "last_weekly_report": "2025-01-21T12:00:00"
+}
+```
+
+## Alert Timing
+
+- **First alert**: After 6 hours of continuous downtime (configurable)
+- **Re-alerts**: Every 24 hours while miners remain down
+- **Recovery**: Sent when miners come back online (only if we sent a down alert)
+
+This avoids alert spam from brief outages (reboots, network blips).
+
+## Adding a New Dashboard
+
+1. Get the Luxor watcher URL (Dashboard > Watcher > Share link)
+2. Add entry to `miners.json`:
+   ```json
+   {
+     "name": "New Client - Location",
+     "dashboard_url": "https://app.luxor.tech/en/views/watcher?token=NEW_TOKEN",
+     "expected_workers": 50
+   }
+   ```
+3. Script will pick it up on next run
 
 ## Troubleshooting
 
-### Script fails to run
-
-Check Python version:
-```bash
-python3 --version  # Should be 3.6+
+### Config file not found
+```
+CONFIG ERROR: Config file not found: /path/to/miners.json
+Copy miners.example.json to miners.json and add your dashboards.
 ```
 
-### Can't scrape worker count
-
-The page might have changed its structure. Run manually with more verbose output:
-```bash
-python3 -u miner_monitor.py
-```
-
-### Email not sending
-
-Test Gmail credentials:
-```bash
-python3 -c "import smtplib; s=smtplib.SMTP('smtp.gmail.com',587); s.starttls(); s.login('codegraymining@gmail.com','oqal afxf qjth purb'); print('Login successful')"
-```
+### One dashboard fails but others work
+The script continues checking remaining dashboards. Check the log for the specific error.
 
 ### Check logs
-
-View recent cron executions:
 ```bash
-tail -f ~/miner-monitor/monitor.log
+tail -f monitor.log
 ```
 
-### Chrome/ChromeDriver issues
+## Security
 
-Update ChromeDriver:
-```bash
-# Get latest version
-CHROME_DRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)
-wget https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip
-unzip chromedriver_linux64.zip
-sudo mv chromedriver /usr/local/bin/
-sudo chmod +x /usr/local/bin/chromedriver
-```
-
-## Manual Testing
-
-Test different scenarios:
-
-```bash
-# Normal run
-python3 miner_monitor.py
-
-# Check state file (in same directory as script)
-cat miner_monitor_state.json
-
-# Reset state (force new alert)
-rm miner_monitor_state.json
-python3 miner_monitor.py
-```
-
-## Configuration Changes
-
-To modify settings, edit `miner_monitor.py`:
-
-```python
-EXPECTED_WORKERS = 57  # Change expected count
-ALERT_COOLDOWN_HOURS = 12  # Change cooldown period
-EMAIL_TO = "cstott@gmail.com"  # Change alert email
-```
-
-## Security Note
-
-The script contains your Gmail app password. Protect this file:
-
-```bash
-chmod 600 miner_monitor.py  # Only you can read/write
-```
-
-Don't commit this file to public repositories.
+- `miners.json` contains dashboard tokens - don't commit to git
+- Already in `.gitignore`
+- Protect with: `chmod 600 miners.json miner_monitor.py`

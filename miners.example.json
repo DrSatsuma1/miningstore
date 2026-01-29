@@ -1,0 +1,18 @@
+{
+  "miners": [
+    {
+      "name": "Client A - Main Site",
+      "dashboard_url": "https://app.luxor.tech/en/views/watcher?token=YOUR_TOKEN_HERE",
+      "expected_workers": 57,
+      "client_id": "clienta",
+      "machine_types": "S19 Pro 110T"
+    },
+    {
+      "name": "Client B - Warehouse",
+      "dashboard_url": "https://app.luxor.tech/en/views/watcher?token=YOUR_TOKEN_HERE",
+      "expected_workers": 120,
+      "client_id": "clientb",
+      "machine_types": "M60S+ 202T"
+    }
+  ]
+}
