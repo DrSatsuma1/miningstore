@@ -145,7 +145,7 @@ def send_email(subject, body):
         msg['To'] = EMAIL_TO
         msg['Subject'] = subject
 
-        msg.attach(MIMEText(body, 'plain'))
+        msg.attach(MIMEText(body, 'html'))
 
         # Connect to Gmail SMTP server
         server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -267,21 +267,88 @@ def send_weekly_report(state):
         uptime_30d_str = "Not enough data yet"
 
     subject = "Weekly Miner Uptime Report"
-    body = f"""Weekly Miner Uptime Report
 
-Uptime Statistics:
-==================
-Last 7 days:  {uptime_7d_str}
-Last 30 days: {uptime_30d_str}
+    # Determine status color and text
+    status_color = "#22c55e" if state['last_status'] == 'ok' else "#ef4444"
+    status_text = "All Miners Online" if state['last_status'] == 'ok' else "Miners Offline"
 
-Current Status:
-===============
-Expected workers: {EXPECTED_WORKERS}
-Last count: {state['last_worker_count']}
-Status: {state['last_status']}
+    body = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px 0;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%); padding: 30px 40px; border-radius: 12px 12px 0 0;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">Weekly Uptime Report</h1>
+                            <p style="margin: 8px 0 0 0; color: #93c5fd; font-size: 14px;">Mining Operations Summary</p>
+                        </td>
+                    </tr>
 
-Report generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
+                    <!-- Main Content -->
+                    <tr>
+                        <td style="background-color: #ffffff; padding: 30px 40px;">
+                            <!-- Uptime Stats Cards -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td width="48%" style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 20px; text-align: center;">
+                                        <p style="margin: 0 0 8px 0; color: #0369a1; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">7-Day Uptime</p>
+                                        <p style="margin: 0; color: #0c4a6e; font-size: 28px; font-weight: 700;">{uptime_7d_str}</p>
+                                    </td>
+                                    <td width="4%"></td>
+                                    <td width="48%" style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 20px; text-align: center;">
+                                        <p style="margin: 0 0 8px 0; color: #0369a1; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">30-Day Uptime</p>
+                                        <p style="margin: 0; color: #0c4a6e; font-size: 28px; font-weight: 700;">{uptime_30d_str}</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Current Status -->
+                            <div style="margin-top: 25px; padding: 20px; background-color: #fafafa; border-radius: 8px; border-left: 4px solid {status_color};">
+                                <h3 style="margin: 0 0 15px 0; color: #374151; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Current Status</h3>
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Status</td>
+                                        <td style="padding: 8px 0; color: {status_color}; font-size: 14px; font-weight: 600; text-align: right;">{status_text}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Expected Workers</td>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{EXPECTED_WORKERS}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Last Count</td>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{state['last_worker_count']}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Action Button -->
+                            <div style="margin-top: 25px; text-align: center;">
+                                <a href="{TARGET_URL}" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-weight: 500; font-size: 14px;">View Dashboard</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f9fafb; padding: 20px 40px; border-radius: 0 0 12px 12px; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 0; color: #9ca3af; font-size: 12px; text-align: center;">
+                                Report generated {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>"""
 
     if send_email(subject, body):
         state['last_weekly_report'] = datetime.now().isoformat()
@@ -507,19 +574,91 @@ def check_and_alert():
 
             if should_alert:
                 subject = f"ALERT: {miners_down} MINER DOWN FOR {hours_down:.1f} HOURS"
-                body = f"""Miner Alert!
+                body = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px 0;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%); padding: 30px 40px; border-radius: 12px 12px 0 0;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">Miner Alert</h1>
+                            <p style="margin: 8px 0 0 0; color: #fecaca; font-size: 14px;">Immediate attention required</p>
+                        </td>
+                    </tr>
 
-Expected workers: {EXPECTED_WORKERS}
-Current workers: {worker_count}
-Miners down: {miners_down}
-Down since: {down_since_dt.strftime('%Y-%m-%d %H:%M:%S')}
-Duration: {hours_down:.1f} hours
+                    <!-- Alert Banner -->
+                    <tr>
+                        <td style="background-color: #fef2f2; padding: 20px 40px; border-bottom: 1px solid #fecaca;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <p style="margin: 0; color: #991b1b; font-size: 32px; font-weight: 700;">{miners_down} Miner{'s' if miners_down > 1 else ''} Down</p>
+                                        <p style="margin: 5px 0 0 0; color: #b91c1c; font-size: 16px;">for {hours_down:.1f} hours</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-Time: {current_time.strftime('%Y-%m-%d %H:%M:%S')}
-URL: {TARGET_URL}
+                    <!-- Main Content -->
+                    <tr>
+                        <td style="background-color: #ffffff; padding: 30px 40px;">
+                            <!-- Status Details -->
+                            <div style="padding: 20px; background-color: #fafafa; border-radius: 8px; border-left: 4px solid #ef4444;">
+                                <h3 style="margin: 0 0 15px 0; color: #374151; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Status Details</h3>
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Expected Workers</td>
+                                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{EXPECTED_WORKERS}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Current Workers</td>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #ef4444; font-size: 14px; font-weight: 600; text-align: right;">{worker_count}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Miners Offline</td>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #ef4444; font-size: 14px; font-weight: 600; text-align: right;">{miners_down}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Down Since</td>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{down_since_dt.strftime('%b %d, %Y %I:%M %p')}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Duration</td>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{hours_down:.1f} hours</td>
+                                    </tr>
+                                </table>
+                            </div>
 
-File a support ticket: {SUPPORT_TICKET_URL}
-"""
+                            <!-- Action Buttons -->
+                            <div style="margin-top: 25px; text-align: center;">
+                                <a href="{TARGET_URL}" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; font-size: 14px; margin-right: 10px;">View Dashboard</a>
+                                <a href="{SUPPORT_TICKET_URL}" style="display: inline-block; background-color: #dc2626; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; font-size: 14px;">Open Support Ticket</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f9fafb; padding: 20px 40px; border-radius: 0 0 12px 12px; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 0; color: #9ca3af; font-size: 12px; text-align: center;">
+                                Alert generated {current_time.strftime('%B %d, %Y at %I:%M %p')}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>"""
                 if send_email(subject, body):
                     state['last_alert_time'] = current_time.isoformat()
             else:
@@ -543,18 +682,86 @@ File a support ticket: {SUPPORT_TICKET_URL}
             # (no point sending "recovered" if we never sent "down")
             if hours_down > DOWN_ALERT_THRESHOLD_HOURS:
                 subject = "RECOVERY - All Miners Back Online"
-                body = f"""All miners have recovered!
+                body = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px 0;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #166534 0%, #22c55e 100%); padding: 30px 40px; border-radius: 12px 12px 0 0;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">All Systems Recovered</h1>
+                            <p style="margin: 8px 0 0 0; color: #bbf7d0; font-size: 14px;">Mining operations restored</p>
+                        </td>
+                    </tr>
 
-Expected workers: {EXPECTED_WORKERS}
-Current workers: {worker_count}
-Previous count: {state['last_worker_count']}
-Total downtime: {hours_down:.1f} hours
+                    <!-- Success Banner -->
+                    <tr>
+                        <td style="background-color: #f0fdf4; padding: 20px 40px; border-bottom: 1px solid #bbf7d0;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <p style="margin: 0; color: #166534; font-size: 32px; font-weight: 700;">All {worker_count} Miners Online</p>
+                                        <p style="margin: 5px 0 0 0; color: #15803d; font-size: 16px;">Recovered after {hours_down:.1f} hours of downtime</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-View Dashboard: {TARGET_URL}
+                    <!-- Main Content -->
+                    <tr>
+                        <td style="background-color: #ffffff; padding: 30px 40px;">
+                            <!-- Recovery Details -->
+                            <div style="padding: 20px; background-color: #fafafa; border-radius: 8px; border-left: 4px solid #22c55e;">
+                                <h3 style="margin: 0 0 15px 0; color: #374151; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Recovery Details</h3>
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Expected Workers</td>
+                                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{EXPECTED_WORKERS}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Current Workers</td>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #22c55e; font-size: 14px; font-weight: 600; text-align: right;">{worker_count}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Previous Count</td>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{state['last_worker_count']}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Total Downtime</td>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{hours_down:.1f} hours</td>
+                                    </tr>
+                                </table>
+                            </div>
 
+                            <!-- Action Button -->
+                            <div style="margin-top: 25px; text-align: center;">
+                                <a href="{TARGET_URL}" style="display: inline-block; background-color: #22c55e; color: #ffffff; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-weight: 500; font-size: 14px;">View Dashboard</a>
+                            </div>
+                        </td>
+                    </tr>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-"""
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f9fafb; padding: 20px 40px; border-radius: 0 0 12px 12px; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 0; color: #9ca3af; font-size: 12px; text-align: center;">
+                                Recovery confirmed {current_time.strftime('%B %d, %Y at %I:%M %p')}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>"""
                 send_email(subject, body)
             else:
                 print(f"Miners recovered after {hours_down:.1f} hours (below {DOWN_ALERT_THRESHOLD_HOURS}h threshold, no notification)")
@@ -635,33 +842,69 @@ if __name__ == "__main__":
         #   - Selenium/Chrome version mismatches
         print(f"FATAL ERROR: {e}")
         try:
-            error_body = f"""
-MONITORING SCRIPT ERROR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            error_body = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px 0;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #92400e 0%, #f59e0b 100%); padding: 30px 40px; border-radius: 12px 12px 0 0;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">Script Error</h1>
+                            <p style="margin: 8px 0 0 0; color: #fef3c7; font-size: 14px;">Monitoring interrupted</p>
+                        </td>
+                    </tr>
 
-⚠️ Script Error
+                    <!-- Warning Banner -->
+                    <tr>
+                        <td style="background-color: #fffbeb; padding: 20px 40px; border-bottom: 1px solid #fde68a;">
+                            <p style="margin: 0; color: #92400e; font-size: 16px; font-weight: 500;">The miner monitoring script encountered an error and may need attention.</p>
+                        </td>
+                    </tr>
 
-The miner monitoring script encountered an error and may need attention.
+                    <!-- Main Content -->
+                    <tr>
+                        <td style="background-color: #ffffff; padding: 30px 40px;">
+                            <!-- Error Details -->
+                            <div style="padding: 20px; background-color: #fef2f2; border-radius: 8px; border-left: 4px solid #ef4444;">
+                                <h3 style="margin: 0 0 10px 0; color: #991b1b; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Error Details</h3>
+                                <p style="margin: 0; color: #7f1d1d; font-size: 14px; font-family: monospace; word-break: break-word;">{str(e)}</p>
+                            </div>
 
+                            <!-- Troubleshooting -->
+                            <div style="margin-top: 25px; padding: 20px; background-color: #fafafa; border-radius: 8px;">
+                                <h3 style="margin: 0 0 15px 0; color: #374151; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Troubleshooting Steps</h3>
+                                <ul style="margin: 0; padding-left: 20px; color: #4b5563; font-size: 14px; line-height: 1.8;">
+                                    <li>Check monitor.log for detailed error information</li>
+                                    <li>Verify ChromeDriver is installed and working</li>
+                                    <li>Ensure network connectivity to Luxor dashboard</li>
+                                    <li>Try restarting the monitoring script</li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
 
-ERROR DETAILS
-
-{str(e)}
-
-Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-
-TROUBLESHOOTING
-
-  • Check monitor.log for detailed error information
-  • Verify ChromeDriver is installed and working
-  • Ensure network connectivity to Luxor dashboard
-  • Try restarting the monitoring script
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-"""
-            send_email("⚠️ Monitor Script Error", error_body)
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f9fafb; padding: 20px 40px; border-radius: 0 0 12px 12px; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 0; color: #9ca3af; font-size: 12px; text-align: center;">
+                                Error occurred {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>"""
+            send_email("Monitor Script Error", error_body)
         except:
             # If email fails too, nothing more we can do
             pass
