@@ -709,53 +709,26 @@ def check_and_alert():
                 <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%;">
                     <!-- Header -->
                     <tr>
-                        <td style="background: linear-gradient(135deg, #166534 0%, #22c55e 100%); padding: 30px 40px; border-radius: 12px 12px 0 0;">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">All Systems Recovered</h1>
-                            <p style="margin: 8px 0 0 0; color: #bbf7d0; font-size: 14px;">Mining operations restored</p>
-                        </td>
-                    </tr>
-
-                    <!-- Success Banner -->
-                    <tr>
-                        <td style="background-color: #f0fdf4; padding: 20px 40px; border-bottom: 1px solid #bbf7d0;">
-                            <table width="100%" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td>
-                                        <p style="margin: 0; color: #166534; font-size: 32px; font-weight: 700;">All {worker_count} Miners Online</p>
-                                        <p style="margin: 5px 0 0 0; color: #15803d; font-size: 16px;">Recovered after {duration_str} of downtime</p>
-                                    </td>
-                                </tr>
-                            </table>
+                        <td style="background-color: #22c55e; padding: 30px 40px; border-radius: 12px 12px 0 0;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">All {worker_count} Miners Online</h1>
+                            <p style="margin: 8px 0 0 0; color: #bbf7d0; font-size: 14px;">Recovered after {duration_str}</p>
                         </td>
                     </tr>
 
                     <!-- Main Content -->
                     <tr>
                         <td style="background-color: #ffffff; padding: 30px 40px;">
-                            <!-- Recovery Details -->
-                            <div style="padding: 20px; background-color: #fafafa; border-radius: 8px; border-left: 4px solid #22c55e;">
-                                <h3 style="margin: 0 0 15px 0; color: #374151; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Recovery Details</h3>
-                                <table width="100%" cellpadding="0" cellspacing="0">
-                                    <tr>
-                                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Expected Workers</td>
-                                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{EXPECTED_WORKERS}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Current Workers</td>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #22c55e; font-size: 14px; font-weight: 600; text-align: right;">{worker_count}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Previous Count</td>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{state['last_worker_count']}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Total Downtime</td>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{duration_str}</td>
-                                    </tr>
-                                </table>
-                            </div>
+                            <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 14px;">
+                                <tr>
+                                    <td style="padding: 10px 0; color: #6b7280;">Previous Count</td>
+                                    <td style="padding: 10px 0; color: #111827; font-weight: 500; text-align: right;">{state['last_worker_count']} miners</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 0; border-top: 1px solid #e5e7eb; color: #6b7280;">Total Downtime</td>
+                                    <td style="padding: 10px 0; border-top: 1px solid #e5e7eb; color: #111827; font-weight: 500; text-align: right;">{duration_str}</td>
+                                </tr>
+                            </table>
 
-                            <!-- Action Button -->
                             <div style="margin-top: 25px; text-align: center;">
                                 <a href="{TARGET_URL}" style="display: inline-block; background-color: #22c55e; color: #ffffff; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-weight: 500; font-size: 14px;">View Dashboard</a>
                             </div>
@@ -764,10 +737,8 @@ def check_and_alert():
 
                     <!-- Footer -->
                     <tr>
-                        <td style="background-color: #f9fafb; padding: 20px 40px; border-radius: 0 0 12px 12px; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0; color: #9ca3af; font-size: 12px; text-align: center;">
-                                Recovery confirmed {current_time.strftime('%B %d, %Y at %I:%M %p')}
-                            </p>
+                        <td style="background-color: #f9fafb; padding: 15px 40px; border-radius: 0 0 12px 12px; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 0; color: #9ca3af; font-size: 12px; text-align: center;">{current_time.strftime('%B %d, %Y at %I:%M %p')}</p>
                         </td>
                     </tr>
                 </table>
