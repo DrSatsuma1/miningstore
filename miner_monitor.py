@@ -55,6 +55,18 @@ GMAIL_APP_PASSWORD = "oqal afxf qjth purb"  # Gmail App Password (16 chars, spac
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "miner_monitor_state.json")
 LOCK_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "miner_monitor.lock")
 
+def format_duration(hours):
+    """Format hours as 'X hours Y minutes' or 'X minutes' if less than 1 hour"""
+    total_minutes = int(hours * 60)
+    h = total_minutes // 60
+    m = total_minutes % 60
+    if h == 0:
+        return f"{m} minute{'s' if m != 1 else ''}"
+    elif m == 0:
+        return f"{h} hour{'s' if h != 1 else ''}"
+    else:
+        return f"{h} hour{'s' if h != 1 else ''} {m} minute{'s' if m != 1 else ''}"
+
 # Alert timing settings
 DOWN_ALERT_THRESHOLD_HOURS = 6  # Only alert after miner is down for this many hours
                                  # (avoids alerts for brief reboots/network blips)
@@ -573,7 +585,8 @@ def check_and_alert():
                 print(f"Sending first alert - miners down for {hours_down:.1f} hours")
 
             if should_alert:
-                subject = f"ALERT: {miners_down} MINER DOWN FOR {hours_down:.1f} HOURS"
+                duration_str = format_duration(hours_down)
+                subject = f"ALERT: {miners_down} MINER DOWN FOR {duration_str.upper()}"
                 body = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -600,7 +613,7 @@ def check_and_alert():
                                 <tr>
                                     <td>
                                         <p style="margin: 0; color: #991b1b; font-size: 32px; font-weight: 700;">{miners_down} Miner{'s' if miners_down > 1 else ''} Down</p>
-                                        <p style="margin: 5px 0 0 0; color: #b91c1c; font-size: 16px;">for {hours_down:.1f} hours</p>
+                                        <p style="margin: 5px 0 0 0; color: #b91c1c; font-size: 16px;">for {duration_str}</p>
                                     </td>
                                 </tr>
                             </table>
@@ -632,7 +645,7 @@ def check_and_alert():
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Duration</td>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{hours_down:.1f} hours</td>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{duration_str}</td>
                                     </tr>
                                 </table>
                             </div>
@@ -681,6 +694,7 @@ def check_and_alert():
             # Only send recovery email if downtime exceeded the alert threshold
             # (no point sending "recovered" if we never sent "down")
             if hours_down > DOWN_ALERT_THRESHOLD_HOURS:
+                duration_str = format_duration(hours_down)
                 subject = "RECOVERY - All Miners Back Online"
                 body = f"""<!DOCTYPE html>
 <html>
@@ -708,7 +722,7 @@ def check_and_alert():
                                 <tr>
                                     <td>
                                         <p style="margin: 0; color: #166534; font-size: 32px; font-weight: 700;">All {worker_count} Miners Online</p>
-                                        <p style="margin: 5px 0 0 0; color: #15803d; font-size: 16px;">Recovered after {hours_down:.1f} hours of downtime</p>
+                                        <p style="margin: 5px 0 0 0; color: #15803d; font-size: 16px;">Recovered after {duration_str} of downtime</p>
                                     </td>
                                 </tr>
                             </table>
@@ -736,7 +750,7 @@ def check_and_alert():
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Total Downtime</td>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{hours_down:.1f} hours</td>
+                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{duration_str}</td>
                                     </tr>
                                 </table>
                             </div>
