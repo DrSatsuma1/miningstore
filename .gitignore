@@ -1,0 +1,77 @@
+# =============================================================================
+# Git Ignore File for Miner Monitor
+# =============================================================================
+# This file tells git which files to NOT track in version control.
+# Files listed here won't be committed to your repository.
+
+# -----------------------------------------------------------------------------
+# Python generated files
+# -----------------------------------------------------------------------------
+# These are created when Python runs and don't need to be tracked.
+__pycache__/          # Python bytecode cache directory
+*.py[cod]             # Compiled Python files (.pyc, .pyo, .pyd)
+*$py.class            # Java-Python compiled files
+*.so                  # Compiled extension modules
+.Python               # Python installation marker
+
+# -----------------------------------------------------------------------------
+# Virtual environments
+# -----------------------------------------------------------------------------
+# If you use a Python virtual environment, don't track it.
+# Virtual envs should be recreated on each machine.
+venv/
+env/
+ENV/
+.venv/
+
+# -----------------------------------------------------------------------------
+# IDE/Editor files
+# -----------------------------------------------------------------------------
+# These are personal IDE settings that shouldn't be shared.
+.vscode/              # Visual Studio Code settings
+.idea/                # PyCharm/IntelliJ settings
+*.swp                 # Vim swap files
+*.swo                 # Vim swap files
+*~                    # Backup files
+
+# -----------------------------------------------------------------------------
+# Operating system files
+# -----------------------------------------------------------------------------
+.DS_Store             # macOS directory metadata
+Thumbs.db             # Windows thumbnail cache
+
+# -----------------------------------------------------------------------------
+# Log files
+# -----------------------------------------------------------------------------
+# Logs can get large and contain sensitive timing information.
+# Don't track them in git.
+*.log
+monitor.log
+
+# -----------------------------------------------------------------------------
+# State files (IMPORTANT!)
+# -----------------------------------------------------------------------------
+# The state file contains runtime data that should NOT be in version control:
+#   - Alert history
+#   - Downtime tracking
+#   - Uptime statistics
+#
+# Each deployment should have its own state file.
+miner_monitor_state.json
+
+# -----------------------------------------------------------------------------
+# Lock files
+# -----------------------------------------------------------------------------
+# Lock files prevent concurrent execution - runtime only.
+*.lock
+miner_monitor.lock
+
+# -----------------------------------------------------------------------------
+# Sensitive files (if you create them)
+# -----------------------------------------------------------------------------
+# If you ever extract credentials to separate files, ignore them here.
+# (The default setup has credentials in miner_monitor.py itself)
+.env
+.env.local
+credentials.json
+secrets.json
