@@ -46,9 +46,9 @@ CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "miners.j
 
 # Email settings - Uses Gmail SMTP with an "App Password" (not your regular password)
 # To create an App Password: Google Account > Security > 2-Step Verification > App Passwords
-EMAIL_FROM = "codegraymining@gmail.com"  # Gmail address to send from
-EMAIL_TO = "cstott@gmail.com"            # Recipient for alerts
-GMAIL_APP_PASSWORD = "oqal afxf qjth purb"  # Gmail App Password (16 chars, spaces ok)
+EMAIL_FROM = "your-email@gmail.com"      # Gmail address to send from
+EMAIL_TO = "alerts@example.com"          # Recipient for alerts
+GMAIL_APP_PASSWORD = "xxxx xxxx xxxx xxxx"  # Gmail App Password (16 chars, spaces ok)
 
 # State and lock files - stored in same directory as script
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "miner_monitor_state.json")
