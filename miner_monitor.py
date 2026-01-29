@@ -34,8 +34,6 @@ from email.mime.multipart import MIMEMultipart
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 # =============================================================================
 # CONFIGURATION - Update these settings for your setup
@@ -404,7 +402,7 @@ def get_worker_count(dashboard_url):
         driver = webdriver.Chrome(options=options)
         driver.get(dashboard_url)
 
-        wait = WebDriverWait(driver, 20)
+        # Wait for page to load - Luxor uses React so content loads dynamically
         time.sleep(5)
 
         # Method 1: Find "Active Miners" label and extract count from parent
