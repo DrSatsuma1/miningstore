@@ -281,78 +281,93 @@ def send_weekly_report(state):
     subject = "Weekly Miner Uptime Report"
 
     # Determine status color and text
-    status_color = "#22c55e" if state['last_status'] == 'ok' else "#ef4444"
+    status_color = "#27ae60" if state['last_status'] == 'ok' else "#d4a017"
     status_text = "All Miners Online" if state['last_status'] == 'ok' else "Miners Offline"
 
-    body = f"""<!DOCTYPE html>
-<html>
+    body = f"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px 0;">
+<body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8f9fa; padding: 40px 0;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%;">
+                <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border: 1px solid #e0e0e0; border-collapse: collapse;">
                     <!-- Header -->
                     <tr>
-                        <td style="background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%); padding: 30px 40px; border-radius: 12px 12px 0 0;">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">Weekly Uptime Report</h1>
-                            <p style="margin: 8px 0 0 0; color: #93c5fd; font-size: 14px;">Mining Operations Summary</p>
+                        <td align="left" style="background-color: #1a2b3c; padding: 35px 30px;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 500; letter-spacing: 0.5px;">Weekly Uptime Report</h1>
+                            <p style="margin: 8px 0 0; color: #b0bec5; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Mining Operations Summary</p>
                         </td>
                     </tr>
 
-                    <!-- Main Content -->
+                    <!-- Intro Text -->
                     <tr>
-                        <td style="background-color: #ffffff; padding: 30px 40px;">
-                            <!-- Uptime Stats Cards -->
-                            <table width="100%" cellpadding="0" cellspacing="0">
+                        <td style="padding: 40px 30px 20px 30px;">
+                            <p style="font-size: 15px; color: #2d3436; line-height: 1.6; margin: 0;">
+                                Here is your weekly summary of mining operations performance.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Uptime Stats Cards -->
+                    <tr>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
                                 <tr>
-                                    <td width="48%" style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 20px; text-align: center;">
-                                        <p style="margin: 0 0 8px 0; color: #0369a1; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">7-Day Uptime</p>
-                                        <p style="margin: 0; color: #0c4a6e; font-size: 28px; font-weight: 700;">{uptime_7d_str}</p>
+                                    <td width="50%" align="center" style="padding: 20px; background-color: #fafafa; border: 1px solid #e0e0e0;">
+                                        <span style="display: block; font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">7-Day Uptime</span>
+                                        <span style="font-size: 24px; font-weight: bold; color: #1a2b3c;">{uptime_7d_str}</span>
                                     </td>
-                                    <td width="4%"></td>
-                                    <td width="48%" style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 20px; text-align: center;">
-                                        <p style="margin: 0 0 8px 0; color: #0369a1; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">30-Day Uptime</p>
-                                        <p style="margin: 0; color: #0c4a6e; font-size: 28px; font-weight: 700;">{uptime_30d_str}</p>
+                                    <td width="50%" align="center" style="padding: 20px; background-color: #fafafa; border: 1px solid #e0e0e0; border-left: none;">
+                                        <span style="display: block; font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">30-Day Uptime</span>
+                                        <span style="font-size: 24px; font-weight: bold; color: #1a2b3c;">{uptime_30d_str}</span>
                                     </td>
                                 </tr>
                             </table>
+                        </td>
+                    </tr>
 
-                            <!-- Current Status -->
-                            <div style="margin-top: 25px; padding: 20px; background-color: #fafafa; border-radius: 8px; border-left: 4px solid {status_color};">
-                                <h3 style="margin: 0 0 15px 0; color: #374151; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Current Status</h3>
-                                <table width="100%" cellpadding="0" cellspacing="0">
-                                    <tr>
-                                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Status</td>
-                                        <td style="padding: 8px 0; color: {status_color}; font-size: 14px; font-weight: 600; text-align: right;">{status_text}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Expected Workers</td>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{EXPECTED_WORKERS}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Last Count</td>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{state['last_worker_count']}</td>
-                                    </tr>
-                                </table>
-                            </div>
+                    <!-- Current Status -->
+                    <tr>
+                        <td style="padding: 0 30px 40px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px; color: #636e72;">
+                                <tr>
+                                    <td style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;"><strong>Current Status:</strong></td>
+                                    <td align="right" style="padding: 10px 0; border-bottom: 1px solid #f1f1f1; color: {status_color}; font-weight: bold;">{status_text}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;"><strong>Expected Miners:</strong></td>
+                                    <td align="right" style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;">{EXPECTED_WORKERS}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;"><strong>Last Count:</strong></td>
+                                    <td align="right" style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;">{state['last_worker_count']}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-                            <!-- Action Button -->
-                            <div style="margin-top: 25px; text-align: center;">
-                                <a href="{TARGET_URL}" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-weight: 500; font-size: 14px;">View Dashboard</a>
-                            </div>
+                    <!-- Button -->
+                    <tr>
+                        <td align="center" style="padding-bottom: 50px;">
+                            <table border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" bgcolor="#1a2b3c" style="border-radius: 4px;">
+                                        <a href="{TARGET_URL}" style="padding: 12px 25px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: bold; display: inline-block;">View Dashboard</a>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
 
                     <!-- Footer -->
                     <tr>
-                        <td style="background-color: #f9fafb; padding: 20px 40px; border-radius: 0 0 12px 12px; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0; color: #9ca3af; font-size: 12px; text-align: center;">
-                                Report generated {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
-                            </p>
+                        <td style="padding: 30px; background-color: #fafafa; border-top: 1px solid #e0e0e0; font-size: 12px; color: #95a5a6; text-align: center;">
+                            Report generated by Code Gray Mining automation.<br/>
+                            {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
                         </td>
                     </tr>
                 </table>
@@ -587,83 +602,94 @@ def check_and_alert():
             if should_alert:
                 duration_str = format_duration(hours_down)
                 subject = f"ALERT: {miners_down} MINER DOWN FOR {duration_str.upper()}"
-                body = f"""<!DOCTYPE html>
-<html>
+                body = f"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px 0;">
+<body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8f9fa; padding: 40px 0;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%;">
+                <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border: 1px solid #e0e0e0; border-collapse: collapse;">
                     <!-- Header -->
                     <tr>
-                        <td style="background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%); padding: 30px 40px; border-radius: 12px 12px 0 0;">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">Miner Alert</h1>
-                            <p style="margin: 8px 0 0 0; color: #fecaca; font-size: 14px;">Immediate attention required</p>
+                        <td align="left" style="background-color: #1a2b3c; padding: 35px 30px;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 500; letter-spacing: 0.5px;">Miner Status Alert</h1>
+                            <p style="margin: 8px 0 0; color: #b0bec5; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Network Monitoring Alert</p>
                         </td>
                     </tr>
 
-                    <!-- Alert Banner -->
+                    <!-- Intro Text -->
                     <tr>
-                        <td style="background-color: #fef2f2; padding: 20px 40px; border-bottom: 1px solid #fecaca;">
-                            <table width="100%" cellpadding="0" cellspacing="0">
+                        <td style="padding: 40px 30px 20px 30px;">
+                            <p style="font-size: 15px; color: #2d3436; line-height: 1.6; margin: 0;">
+                                This is an automated notification regarding your mining hardware. Our system has detected that several units are currently inactive.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Stats Cards -->
+                    <tr>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
                                 <tr>
-                                    <td>
-                                        <p style="margin: 0; color: #991b1b; font-size: 32px; font-weight: 700;">{miners_down} Miner{'s' if miners_down > 1 else ''} Down</p>
-                                        <p style="margin: 5px 0 0 0; color: #b91c1c; font-size: 16px;">for {duration_str}</p>
+                                    <td width="33%" align="center" style="padding: 20px; background-color: #fafafa; border: 1px solid #e0e0e0;">
+                                        <span style="display: block; font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">Expected</span>
+                                        <span style="font-size: 24px; font-weight: bold; color: #1a2b3c;">{EXPECTED_WORKERS}</span>
+                                    </td>
+                                    <td width="33%" align="center" style="padding: 20px; background-color: #fafafa; border: 1px solid #e0e0e0; border-left: none; border-right: none;">
+                                        <span style="display: block; font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">Online</span>
+                                        <span style="font-size: 24px; font-weight: bold; color: #1a2b3c;">{worker_count}</span>
+                                    </td>
+                                    <td width="33%" align="center" style="padding: 20px; background-color: #fafafa; border: 1px solid #e0e0e0;">
+                                        <span style="display: block; font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">Offline</span>
+                                        <span style="font-size: 24px; font-weight: bold; color: #d4a017;">{miners_down}</span>
                                     </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
 
-                    <!-- Main Content -->
+                    <!-- Details -->
                     <tr>
-                        <td style="background-color: #ffffff; padding: 30px 40px;">
-                            <!-- Status Details -->
-                            <div style="padding: 20px; background-color: #fafafa; border-radius: 8px; border-left: 4px solid #ef4444;">
-                                <h3 style="margin: 0 0 15px 0; color: #374151; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Status Details</h3>
-                                <table width="100%" cellpadding="0" cellspacing="0">
-                                    <tr>
-                                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Expected Workers</td>
-                                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{EXPECTED_WORKERS}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Current Workers</td>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #ef4444; font-size: 14px; font-weight: 600; text-align: right;">{worker_count}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Miners Offline</td>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #ef4444; font-size: 14px; font-weight: 600; text-align: right;">{miners_down}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Down Since</td>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{down_since_dt.strftime('%b %d, %Y %I:%M %p')}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">Duration</td>
-                                        <td style="padding: 8px 0; border-top: 1px solid #e5e7eb; color: #111827; font-size: 14px; font-weight: 500; text-align: right;">{duration_str}</td>
-                                    </tr>
-                                </table>
-                            </div>
+                        <td style="padding: 0 30px 40px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px; color: #636e72;">
+                                <tr>
+                                    <td style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;"><strong>Down Since:</strong></td>
+                                    <td align="right" style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;">{down_since_dt.strftime('%B %d, %Y at %I:%M %p')}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;"><strong>Duration:</strong></td>
+                                    <td align="right" style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;">{duration_str}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-                            <!-- Action Buttons -->
-                            <div style="margin-top: 25px; text-align: center;">
-                                <a href="{TARGET_URL}" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; font-size: 14px; margin-right: 10px;">View Dashboard</a>
-                                <a href="{SUPPORT_TICKET_URL}" style="display: inline-block; background-color: #dc2626; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; font-size: 14px;">Open Support Ticket</a>
-                            </div>
+                    <!-- Buttons -->
+                    <tr>
+                        <td align="center" style="padding-bottom: 50px;">
+                            <table border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" bgcolor="#1a2b3c" style="border-radius: 4px;">
+                                        <a href="{TARGET_URL}" style="padding: 12px 25px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: bold; display: inline-block;">View Dashboard</a>
+                                    </td>
+                                    <td width="15"></td>
+                                    <td align="center" bgcolor="#ffffff" style="border-radius: 4px; border: 1px solid #e0e0e0;">
+                                        <a href="{SUPPORT_TICKET_URL}" style="padding: 12px 25px; color: #1a2b3c; text-decoration: none; font-size: 14px; font-weight: bold; display: inline-block;">Open Support Ticket</a>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
 
                     <!-- Footer -->
                     <tr>
-                        <td style="background-color: #f9fafb; padding: 20px 40px; border-radius: 0 0 12px 12px; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0; color: #9ca3af; font-size: 12px; text-align: center;">
-                                Alert generated {current_time.strftime('%B %d, %Y at %I:%M %p')}
-                            </p>
+                        <td style="padding: 30px; background-color: #fafafa; border-top: 1px solid #e0e0e0; font-size: 12px; color: #95a5a6; text-align: center;">
+                            Alert generated by Code Gray Mining automation.<br/>
+                            {current_time.strftime('%B %d, %Y at %I:%M %p')}
                         </td>
                     </tr>
                 </table>
@@ -696,49 +722,70 @@ def check_and_alert():
             if hours_down > DOWN_ALERT_THRESHOLD_HOURS:
                 duration_str = format_duration(hours_down)
                 subject = "RECOVERY - All Miners Back Online"
-                body = f"""<!DOCTYPE html>
-<html>
+                body = f"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px 0;">
+<body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8f9fa; padding: 40px 0;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%;">
+                <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border: 1px solid #e0e0e0; border-collapse: collapse;">
                     <!-- Header -->
                     <tr>
-                        <td style="background-color: #22c55e; padding: 30px 40px; border-radius: 12px 12px 0 0;">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">All {worker_count} Miners Online</h1>
-                            <p style="margin: 8px 0 0 0; color: #bbf7d0; font-size: 14px;">Recovered after {duration_str}</p>
+                        <td align="left" style="background-color: #1a2b3c; padding: 35px 30px;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 500; letter-spacing: 0.5px;">All Miners Back Online</h1>
+                            <p style="margin: 8px 0 0; color: #b0bec5; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Recovery Notification</p>
                         </td>
                     </tr>
 
-                    <!-- Main Content -->
+                    <!-- Intro Text -->
                     <tr>
-                        <td style="background-color: #ffffff; padding: 30px 40px;">
-                            <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 14px;">
+                        <td style="padding: 40px 30px 20px 30px;">
+                            <p style="font-size: 15px; color: #2d3436; line-height: 1.6; margin: 0;">
+                                Good news - all mining units have reconnected and are operating normally.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Stats Cards -->
+                    <tr>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
                                 <tr>
-                                    <td style="padding: 10px 0; color: #6b7280;">Previous Count</td>
-                                    <td style="padding: 10px 0; color: #111827; font-weight: 500; text-align: right;">{state['last_worker_count']} miners</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px 0; border-top: 1px solid #e5e7eb; color: #6b7280;">Total Downtime</td>
-                                    <td style="padding: 10px 0; border-top: 1px solid #e5e7eb; color: #111827; font-weight: 500; text-align: right;">{duration_str}</td>
+                                    <td width="50%" align="center" style="padding: 20px; background-color: #fafafa; border: 1px solid #e0e0e0;">
+                                        <span style="display: block; font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">Miners Online</span>
+                                        <span style="font-size: 24px; font-weight: bold; color: #27ae60;">{worker_count}</span>
+                                    </td>
+                                    <td width="50%" align="center" style="padding: 20px; background-color: #fafafa; border: 1px solid #e0e0e0; border-left: none;">
+                                        <span style="display: block; font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">Total Downtime</span>
+                                        <span style="font-size: 24px; font-weight: bold; color: #1a2b3c;">{duration_str}</span>
+                                    </td>
                                 </tr>
                             </table>
+                        </td>
+                    </tr>
 
-                            <div style="margin-top: 25px; text-align: center;">
-                                <a href="{TARGET_URL}" style="display: inline-block; background-color: #22c55e; color: #ffffff; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-weight: 500; font-size: 14px;">View Dashboard</a>
-                            </div>
+                    <!-- Button -->
+                    <tr>
+                        <td align="center" style="padding-bottom: 50px;">
+                            <table border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" bgcolor="#1a2b3c" style="border-radius: 4px;">
+                                        <a href="{TARGET_URL}" style="padding: 12px 25px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: bold; display: inline-block;">View Dashboard</a>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
 
                     <!-- Footer -->
                     <tr>
-                        <td style="background-color: #f9fafb; padding: 15px 40px; border-radius: 0 0 12px 12px; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0; color: #9ca3af; font-size: 12px; text-align: center;">{current_time.strftime('%B %d, %Y at %I:%M %p')}</p>
+                        <td style="padding: 30px; background-color: #fafafa; border-top: 1px solid #e0e0e0; font-size: 12px; color: #95a5a6; text-align: center;">
+                            Recovery confirmed by Code Gray Mining automation.<br/>
+                            {current_time.strftime('%B %d, %Y at %I:%M %p')}
                         </td>
                     </tr>
                 </table>
@@ -827,60 +874,76 @@ if __name__ == "__main__":
         #   - Selenium/Chrome version mismatches
         print(f"FATAL ERROR: {e}")
         try:
-            error_body = f"""<!DOCTYPE html>
-<html>
+            error_body = f"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px 0;">
+<body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8f9fa; padding: 40px 0;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%;">
+                <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border: 1px solid #e0e0e0; border-collapse: collapse;">
                     <!-- Header -->
                     <tr>
-                        <td style="background: linear-gradient(135deg, #92400e 0%, #f59e0b 100%); padding: 30px 40px; border-radius: 12px 12px 0 0;">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">Script Error</h1>
-                            <p style="margin: 8px 0 0 0; color: #fef3c7; font-size: 14px;">Monitoring interrupted</p>
+                        <td align="left" style="background-color: #1a2b3c; padding: 35px 30px;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 500; letter-spacing: 0.5px;">Script Error</h1>
+                            <p style="margin: 8px 0 0; color: #b0bec5; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Monitoring Interrupted</p>
                         </td>
                     </tr>
 
-                    <!-- Warning Banner -->
+                    <!-- Intro Text -->
                     <tr>
-                        <td style="background-color: #fffbeb; padding: 20px 40px; border-bottom: 1px solid #fde68a;">
-                            <p style="margin: 0; color: #92400e; font-size: 16px; font-weight: 500;">The miner monitoring script encountered an error and may need attention.</p>
+                        <td style="padding: 40px 30px 20px 30px;">
+                            <p style="font-size: 15px; color: #2d3436; line-height: 1.6; margin: 0;">
+                                The miner monitoring script encountered an error and may need attention.
+                            </p>
                         </td>
                     </tr>
 
-                    <!-- Main Content -->
+                    <!-- Error Details -->
                     <tr>
-                        <td style="background-color: #ffffff; padding: 30px 40px;">
-                            <!-- Error Details -->
-                            <div style="padding: 20px; background-color: #fef2f2; border-radius: 8px; border-left: 4px solid #ef4444;">
-                                <h3 style="margin: 0 0 10px 0; color: #991b1b; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Error Details</h3>
-                                <p style="margin: 0; color: #7f1d1d; font-size: 14px; font-family: monospace; word-break: break-word;">{str(e)}</p>
-                            </div>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 20px; background-color: #fafafa; border: 1px solid #e0e0e0;">
+                                        <span style="display: block; font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 10px;">Error Details</span>
+                                        <span style="font-size: 14px; color: #c0392b; font-family: monospace; word-break: break-word;">{str(e)}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-                            <!-- Troubleshooting -->
-                            <div style="margin-top: 25px; padding: 20px; background-color: #fafafa; border-radius: 8px;">
-                                <h3 style="margin: 0 0 15px 0; color: #374151; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Troubleshooting Steps</h3>
-                                <ul style="margin: 0; padding-left: 20px; color: #4b5563; font-size: 14px; line-height: 1.8;">
-                                    <li>Check monitor.log for detailed error information</li>
-                                    <li>Verify ChromeDriver is installed and working</li>
-                                    <li>Ensure network connectivity to Luxor dashboard</li>
-                                    <li>Try restarting the monitoring script</li>
-                                </ul>
-                            </div>
+                    <!-- Troubleshooting -->
+                    <tr>
+                        <td style="padding: 0 30px 40px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px; color: #636e72;">
+                                <tr>
+                                    <td colspan="2" style="padding: 0 0 15px 0;"><strong>Troubleshooting Steps:</strong></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #f1f1f1;">1. Check monitor.log for detailed error information</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #f1f1f1;">2. Verify ChromeDriver is installed and working</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #f1f1f1;">3. Ensure network connectivity to Luxor dashboard</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #f1f1f1;">4. Try restarting the monitoring script</td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
 
                     <!-- Footer -->
                     <tr>
-                        <td style="background-color: #f9fafb; padding: 20px 40px; border-radius: 0 0 12px 12px; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0; color: #9ca3af; font-size: 12px; text-align: center;">
-                                Error occurred {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
-                            </p>
+                        <td style="padding: 30px; background-color: #fafafa; border-top: 1px solid #e0e0e0; font-size: 12px; color: #95a5a6; text-align: center;">
+                            Error logged by Code Gray Mining automation.<br/>
+                            {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
                         </td>
                     </tr>
                 </table>
